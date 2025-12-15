@@ -112,7 +112,7 @@
 
         <div class="buttons">
 
-            <a href="#" class="btn">
+            <a href="{{ route('converterSQ.index') }}" class="btn btn-green">
                 SQ
             </a>
 

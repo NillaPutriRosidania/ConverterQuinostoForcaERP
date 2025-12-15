@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuinosConverterController;
 use App\Http\Controllers\QuinosConverterLantai12Controller;
+use App\Http\Controllers\QuinosConverterSQController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,3 +19,6 @@ Route::get('/converter/lantai-12',
 Route::post('/converter/lantai-12/run', 
     [QuinosConverterLantai12Controller::class, 'convert']
 )->name('converter.lantai12.run');
+
+Route::get('/converterSQ', [QuinosConverterSQController::class, 'index'])->name('converterSQ.index');
+Route::post('/converterSQ/run', [QuinosConverterSQController::class, 'convert'])->name('converterSQ.run');
