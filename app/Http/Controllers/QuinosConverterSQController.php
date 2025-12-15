@@ -31,6 +31,31 @@ class QuinosConverterSQController extends Controller
         return false;
     }
 
+    private function isModifierRow(array $row, array $modifierNotesUpper): bool
+    {
+        $nameUpper = strtoupper(trim($row['name'] ?? ''));
+        $category  = strtoupper(trim($row['category'] ?? ''));
+        $department = strtoupper(trim($row['department'] ?? ''));
+
+        // 1. berdasarkan notes array
+        if (in_array($nameUpper, $modifierNotesUpper, true)) {
+            return true;
+        }
+
+        // 2. berdasarkan category / department
+        if ($category === 'MODIFIER' || $department === 'MODIFIER') {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function normalizeProductName(string $name): string
+    {
+        return trim(str_replace('#', '', $name));
+    }
+
+
     public function convert(Request $request)
     {
         // 1. VALIDASI 2 FILE
@@ -209,6 +234,7 @@ class QuinosConverterSQController extends Controller
         $nameIndex  = array_search('Description', $inputHeader); // <-- dulu "Name"
         $catIndex  = array_search('Category', $inputHeader);
         $deptIndex = array_search('Department', $inputHeader);
+        $custIndex = array_search('Customer', $inputHeader);
 
         if ($catIndex === false || $deptIndex === false) {
             fclose($handleDetail);
@@ -456,6 +482,7 @@ class QuinosConverterSQController extends Controller
             $priceRaw = trim($row[$priceIndex] ?? '0');
             $categoryRaw   = trim($row[$catIndex] ?? '');
             $departmentRaw = trim($row[$deptIndex] ?? '');
+            $customRaw = trim($row[$custIndex] ?? '');
 
             // buang koma ribuan
             $qtyStr   = str_replace(',', '', $qtyRaw);
@@ -471,6 +498,7 @@ class QuinosConverterSQController extends Controller
                 'price' => $price,
                 'category'   => $categoryRaw,
                 'department' => $departmentRaw,
+                'customer' => $customRaw,
             ];
         }
         fclose($handleDetail);
@@ -492,13 +520,13 @@ class QuinosConverterSQController extends Controller
             // hitung unit price
             $unitPrice = $qty != 0 ? $price / $qty : 0;
 
-            $upperName = strtoupper(trim($name));
 
-            if (in_array($upperName, $modifierNotesUpper, true)) {
-                continue;
+            if ($this->isModifierRow($current, $modifierNotesUpper)) {
+                    continue;
             }
 
             // 2) JIKA BARIS INI ADALAH PAKET/COMBO
+
             if (in_array($name, $comboNames, true)) {
 
                 $childrenIndex = [];
@@ -507,55 +535,50 @@ class QuinosConverterSQController extends Controller
                 while ($j < $totalRaw) {
                     $next = $rawRows[$j];
 
-                    // beda transaksi → stop
+                    // 1. beda invoice / trx → stop combo
                     if ($next['trx'] !== $trxCode) {
                         break;
                     }
 
-                    $nextName = trim($next['name']);
-
-                    // 1️⃣ anak combo → diawali #
-                    if (strpos($nextName, '#') === 0) {
-                        $childrenIndex[] = $j;
+                    // 2. modifier / notes → skip tapi combo lanjut
+                    if ($this->isModifierRow($next, $modifierNotesUpper)) {
                         $j++;
                         continue;
                     }
 
-                    // 2️⃣ bukan # tapi NOTES → lewati, combo masih lanjut
-                    if ($this->isNotes($next, $modifierNotesUpper)) {
-                        $j++;
-                        continue;
+                    // 3. ketemu combo baru → stop (hindari nested combo)
+                    if (in_array($next['name'], $comboNames, true)) {
+                        break;
                     }
 
-                    // 3️⃣ bukan # dan bukan notes → item baru
-                    break;
+                    // 4. item valid → bagian dari combo
+                    $childrenIndex[] = $j;
+                    $j++;
                 }
 
                 $childCount = count($childrenIndex);
 
+                // hanya proses jika combo valid
                 if ($childCount > 0 && $qty > 0 && $price > 0) {
-                    $unitPricePaket = $unitPrice;
-                    $unitPriceChild = $unitPricePaket / $childCount;
+
+                    $unitPriceChild = ($price / $qty) / $childCount;
 
                     foreach ($childrenIndex as $idxChild) {
                         $child = $rawRows[$idxChild];
 
-                        $cleanName = ltrim(trim($child['name']), '# ');
-                        $childQty  = $child['qty'] > 0 ? $child['qty'] : $qty;
-
                         $logicalRows[] = [
-                            'trx'       => $child['trx'],
-                            'name'      => $cleanName,
-                            'qty'       => $childQty,
-                            'unitPrice' => $unitPriceChild,
+                            'trx'       => $trxCode,          // invoice sama
+                            'name'      => trim($child['name']),
+                            'qty'       => $child['qty'] > 0 ? $child['qty'] : $qty,
+                            'unitPrice' => $unitPriceChild,   // harga dibagi rata
                         ];
                     }
                 }
 
-                // skip semua baris anak & notes
+                // lompat ke baris setelah combo
                 $i = $j - 1;
 
-                // baris combo induk tidak dimasukkan
+                // combo header tidak dimasukkan
                 continue;
             }
 
@@ -566,6 +589,7 @@ class QuinosConverterSQController extends Controller
                 'name'      => $name,
                 'qty'       => $qty,
                 'unitPrice' => $unitPrice,
+                'customer'  => $current['customer'],
             ];
         }
 
@@ -589,14 +613,18 @@ class QuinosConverterSQController extends Controller
             'C_Activity_ID[Value]',                         // 12
             'M_Warehouse_ID[Value]',                        // 13
             'SalesRep_ID[Name]',                            // 14
-            'IsActive',                                     // 15
-            'FORCA_ImportSalesPOSLine>AD_Org_ID[Name]',     // 16
-            'Line No',                                      // 17
-            'FORCA_ImportSalesPOSLine>M_Product_ID[Value]', // 18
-            'FORCA_ImportSalesPOSLine>PriceActual',         // 19
-            'FORCA_ImportSalesPOSLine>QtyOrdered',          // 20
-            'FORCA_ImportSalesPOSLine>C_Tax_ID[Name]',      // 21
-            'FORCA_ImportSalesPOSLine>IsActive',            // 22
+            'C_Currency_ID',                                // 15
+            'IsActive',                                     // 16
+            'C_DocType_ID[Name]',                           // 17
+            'M_PriceList_ID[Name]',                         // 18
+            'C_PaymentTerm_ID[Value]',                      // 19
+            'FORCA_ImportSalesPOSLine>AD_Org_ID[Name]',     // 20
+            'Line No',                                      // 21
+            'FORCA_ImportSalesPOSLine>M_Product_ID[Value]', // 22
+            'FORCA_ImportSalesPOSLine>PriceActual',         // 23
+            'FORCA_ImportSalesPOSLine>QtyOrdered',          // 24
+            'FORCA_ImportSalesPOSLine>C_Tax_ID[Name]',      // 25
+            'FORCA_ImportSalesPOSLine>IsActive',            // 26
         ];
 
         /* =========================================================
@@ -631,14 +659,24 @@ class QuinosConverterSQController extends Controller
             'Cold White Coconut Kilen'                 => '1001685_Cold White Coconut - KOPI KILEN (DRINKS)',
             'Cold White Original'                      => '1001683_Cold White Original - KOPI KILEN (DRINKS)',
             'Creamy Dopio Espresso'                    => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
+            'Creamy Doppio Espresso'                   => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
             'Daily Brew (V-60) Hot (Bali Batu'         => '1001815_Daily Brew (V-60) Hot (Bali Batukaru) - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Hot (Mandailin'         => '1001816_Daily Brew (V-60) Hot (Mandailing) - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Iced (Mandaili'         => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
+            'V60 Bali Batukaru (Hot)'                  => '1001815_Daily Brew (V-60) Hot (Bali Batukaru) - KOPI KILEN (DRINKS)',
             'Daily Brew (V-60) Iced (Bali Bat'         => '1001818_Daily Brew (V-60) Iced (Bali Batukaru) - KOPI KILEN (DRINKS)',
+            'V60 Bali Batukaru (Iced)'                 => '1001818_Daily Brew (V-60) Iced (Bali Batukaru) - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Hot (Mandailin'         => '1001816_Daily Brew (V-60) Hot (Mandailing) - KOPI KILEN (DRINKS)',
+            'V60 Mandailing (Hot)'                     => '1001816_Daily Brew (V-60) Hot (Mandailing) - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Iced (Mandaili'         => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
+            'V60 Mandailing (Iced)'                    => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
             'Daily Brew(V-60) Hot (Aceh Gayo)'         => '1001819_Daily Brew(V-60) Hot (Aceh Gayo) - KOPI KILEN (DRINKS)',
-            'Daily Brew(V-60) Hot (Toraja Sap'         => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Daily Brew(V-60) Iced (Toraja Sa'         => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'V60 Aceh Gayo (Hot)'                      => '1001819_Daily Brew(V-60) Hot (Aceh Gayo) - KOPI KILEN (DRINKS)',
             'Daily Brew(V-60) Iced (Aceh Gayo'         => '1001822_Daily Brew(V-60) Iced (Aceh Gayo) - KOPI KILEN (DRINKS)',
+            'V60 Aceh Gayo (Iced)'                     => '1001822_Daily Brew(V-60) Iced (Aceh Gayo) - KOPI KILEN (DRINKS)',
+            'Daily Brew(V-60) Hot (Toraja Sap'         => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'V60 Toraja Sapan (Hot)'                   => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Daily Brew(V-60) Iced (Toraja Sa'         => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'V60 Toraja Sapan (Iced)'                  => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            
             'Espresso'                                 => '1001823_Esspreso - KOPI KILEN (DRINKS)',
             'Espresso Shot'                            => '1002337_Add on Essppresso - KOPI KILEN (DRINKS)',
             'Flat White (Hot)'                         => '1001824_Flat White - KOPI KILEN (DRINKS)',
@@ -650,29 +688,36 @@ class QuinosConverterSQController extends Controller
             'Hazelnut Latte (Iced)'                    => '1001828_Hazelnut Latte (Iced) - KOPI KILEN (DRINKS)',
             'Hazelnut Latte'                           => '1001828_Hazelnut Latte (Iced) - KOPI KILEN (DRINKS)',
             'Honey Citron Tea Hot'                     => '1001829_Honey Citron Tea Hot - KOPI KILEN (DRINKS)',
+            'Honey Citron Tea (Hot)'                   => '1001829_Honey Citron Tea Hot - KOPI KILEN (DRINKS)',
             'Honey Citron Tea Iced'                    => '1001931_Honey Citron Tea Iced - KOPI KILEN (DRINKS)',
+            'Honey Citron Tea (Iced)'                  => '1001931_Honey Citron Tea Iced - KOPI KILEN (DRINKS)',
             'Honey Citron Tea'                         => '1001931_Honey Citron Tea Iced - KOPI KILEN (DRINKS)',
             'Java Tea (Hot)'                           => '1001830_Java Tea (Hot) - KOPI KILEN (DRINKS)',
             'Java Tea (Iced)'                          => '1001831_Java Tea (Ice) - KOPI KILEN (DRINKS)',
             'Java Tea'                                 => '1001831_Java Tea (Ice) - KOPI KILEN (DRINKS)',
             'Lemon Tea Hot'                            => '1001832_Lemon Tea (Hot) - KOPI KILEN (DRINKS)',
-            'Lemon Tea Iced'                           => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',
+            'Lemon Tea Iced'                           => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',  
+            'Lemon Tea'                                => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',
             'Lychee Tea Iced'                          => '1001834_Lychee Tea - KOPI KILEN (DRINKS)',
             'Lychee Tea'                               => '1001834_Lychee Tea - KOPI KILEN (DRINKS)',
+            'Lychee Tea (Iced)'                        => '1001834_Lychee Tea - KOPI KILEN (DRINKS)',   
             'Macchiato'                                => '1001835_Macchiato (Hot) - KOPI KILEN (DRINKS)',
             'Mocha Latte (Hot)'                        => '1001836_Mocha Latte (Hot) - KOPI KILEN (DRINKS)',
             'Mocha Latte (Iced)'                       => '1001837_Mocha Latte (Ice) - KOPI KILEN (DRINKS)',
+            'Mocca Latte'                              => '1001837_Mocha Latte (Ice) - KOPI KILEN (DRINKS)',    
             'Peach Tea'                                => '1001838_Peach Tea - KOPI KILEN (DRINKS)',
             'Peach Tea Iced'                           => '1001838_Peach Tea - KOPI KILEN (DRINKS)',
             'Piccolo'                                  => '1001839_Piccolo (Hot) - KOPI KILEN (DRINKS)',
+            'Piccolo (Hot)'                            => '1001839_Piccolo (Hot) - KOPI KILEN (DRINKS)',
             'Pokka Green Tea'                          => '1001687_Pokka Green Tea - KOPI KILEN (DRINKS)',
             'Red Velvet (Iced)'                        => '1001841_Red Velvet (Ice) - KOPI KILEN (DRINKS)',
             'Water'                                    => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
+            'Mineral Water'                            => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
             'Toraja Sapan 250g'                        => '1001520_Toraja Sapan Biji @250 Gr - KOPI KILEN (DRINKS)',
             'Vanilla Latte (Hot)'                      => '1001842_Vanilla Latte (Hot) - KOPI KILEN (DRINKS)',
             'Vanilla Latte (Iced)'                     => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
             'Vanila Latte'                             => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
-            'TAKE AWAY HOT'                            => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+            
 
             // MEALS
             'Ayam Bakar'                               => '1001769_Ayam Bakar - KOPI KILEN (MEALS)',
@@ -683,13 +728,16 @@ class QuinosConverterSQController extends Controller
             'Chicken Blackpepper'                      => '1001772_Chicken Blackpepper - KOPI KILEN (MEALS)',
             'Chicken Katsu Rice Bowl'                  => '1001773_Chicken Katsu Rice Bowl - KOPI KILEN (MEALS)',
             'Chicken Satay'                            => '1001774_Chicken Satay - KOPI KILEN (MEALS)',
+            'Sate Ayam'                                => '1001774_Chicken Satay - KOPI KILEN (MEALS)',
             'Chocolate Cake with Espresso'             => '1001703_Chocolate Cake with Espresso - KOPI KILEN (MEALS)',
             'Cireng'                                   => '1001775_Cireng - KOPI KILEN (MEALS)',
             'Ikan Dori Asam Manis'                     => '1001776_Dori Asam Manis - KOPI KILEN (MEALS)',
+            'Dori Asam Manis'                          => '1001776_Dori Asam Manis - KOPI KILEN (MEALS)',
             'Dori Sambal Matah'                        => '1001778_Dori Sambal Matah - KOPI KILEN (MEALS)',
             'French Fries'                             => '1001779_French Fries - KOPI KILEN (MEALS)',
             'Internet Goreng Kilen'                    => '1001780_Internet Goreng Kilen - KOPI KILEN (MEALS)',
             'Internet Rebus'                           => '1001781_Internet Rebus - KOPI KILEN (MEALS)',
+            'Internet Rebus Kilen'                           => '1001781_Internet Rebus - KOPI KILEN (MEALS)',
             'Lontong Sayur'                            => '1001782_Lontong Sayur - KOPI KILEN (MEALS)',
             'Mie Ayam Pangsit'                         => '1001783_Mie Ayam - KOPI KILEN (MEALS)',
             'Mie Goreng Ayam Betutu'                   => '1001784_Mie Goreng Ayam Betutu - KOPI KILEN (MEALS)',
@@ -700,6 +748,7 @@ class QuinosConverterSQController extends Controller
             'Bundling Roti Bakar'                      => '1001789_Roti Bakar Bundling - KOPI KILEN (MEALS)',
             'Soto Ayam'                                => '1001790_Soto Ayam - KOPI KILEN (MEALS)',
             'Soto betawi'                              => '1001791_Soto Betawi - KOPI KILEN (MEALS)',
+            'Soto Betawi'                              => '1001791_Soto Betawi - KOPI KILEN (MEALS)',
             'Spicy Chicken Bites'                      => '1001792_Spicy Chicken Bites - KOPI KILEN (MEALS)',
             'Tahu isi'                                 => '1001793_Tahu Isi Sayur - KOPI KILEN (MEALS)',
             'Tahu Lada Garam'                          => '1001794_Tahu Lada Garam - KOPI KILEN (MEALS)',
@@ -712,13 +761,23 @@ class QuinosConverterSQController extends Controller
             'Toast'                                    => '1001796_Toast Kaya Butter - KOPI KILEN (MEALS)',
 
             // Add On
+            'Egg'                                      => '1002324_Add Egg Chicken/Telur Ayam - KOPI KILEN (MEALS)',
             'egg'                                      => '1002324_Add Egg Chicken/Telur Ayam - KOPI KILEN (MEALS)',
             'Add Egg Chicken/Telur Ayam'               => '1002324_Add Egg Chicken/Telur Ayam - KOPI KILEN (MEALS)',
             'Add Rice'                                 => '1002327_Add Rice - KOPI KILEN (MEALS)',
+            'Add On Rice'                              => '1002327_Add Rice - KOPI KILEN (MEALS)',
             'Add on Rice'                              => '1002327_Add Rice - KOPI KILEN (MEALS)',
             'Add On Chicken'                           => '1002326_Add On Chicken - KOPI KILEN (MEALS)',
             'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
+
+            // Perlengkapan
+            'Paper Bag Kilen'                          => '1002214_Paper Bag Kilen - KOPI KILEN PERLENGKAPAN',
+            'Spunbond Kilen'                           => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
+            'Spunbond Bag Kilen'                       => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
+            'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
+            'TAKE AWAY HOT'                            => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
         ];
+
 
         /* =========================================================
          * 6. BANGUN CSV OUTPUT
@@ -753,6 +812,7 @@ class QuinosConverterSQController extends Controller
             $nameRaw   = $row['name'];
             $qty       = (float) $row['qty'];
             $unitPrice = (float) $row['unitPrice'];
+            $customer = $current['customer'];
 
             // hitung Line No per Trx Code: 10, 20, 30, ...
             if (! isset($lineNoByTrx[$trxCode])) {
@@ -768,7 +828,7 @@ class QuinosConverterSQController extends Controller
                 'discount' => '0',
                 'service'  => '0',
                 'rounding' => '0',
-                'customer' => '',
+                // 'customer' => '',
             ];
 
             $discountAmount = (float) $sum['discount'];
@@ -789,7 +849,7 @@ class QuinosConverterSQController extends Controller
                 $tanggalIndo = sprintf('%02d %s %04d', (int) $day, $bulanText, (int) $year);
             }
 
-            $customer = $sum['customer'];
+            $customer = trim($row['customer'] ?? '');
 
             if ($tanggalIndo !== '') {
                 if ($customer === '') {
@@ -800,7 +860,9 @@ class QuinosConverterSQController extends Controller
             }
 
             // product ID: kalau tidak ada di map, pakai nama asli dari Quinos
-            $productId = $productMap[$nameRaw] ?? $nameRaw;
+            $cleanName = $this->normalizeProductName($nameRaw);
+            $productId = $productMap[$cleanName] ?? $cleanName;
+            $productTrim = explode('_', $productId)[0];
 
             $outputRow = [
                 0  => 'Head Office',
@@ -818,20 +880,24 @@ class QuinosConverterSQController extends Controller
                 12 => '1000006',
                 13 => 'KOPI KILEN SQ - JAKARTA',
                 14 => 'Ely Ruknia Sari',
-                15 => 'Y',
-                16 => '*',
-                17 => $lineNo,       // Line No: 10, 20, 30 per Trx Code
-                18 => $productId,    // M_Product_ID[Value]
-                19 => $unitPrice,    // PriceActual
-                20 => $qty,          // QtyOrdered
-                21 => 'PB1 10%',
-                22 => 'Y',
+                15 => '303',
+                16 => 'Y',
+                17 => 'Food and Beverage',
+                18 => 'Sales Exclude Tax',
+                19 => '1. Immediate',
+                20 => 'Head Office',
+                21 => $lineNo,       // Line No: 10, 20, 30 per Trx Code
+                22 => $productTrim,    // M_Product_ID[Value]
+                23 => $unitPrice,    // PriceActual
+                24 => $qty,          // QtyOrdered
+                25 => 'PB1 10%',
+                26 => 'Y',
             ];
 
             // Kalau Trx Code ini sudah pernah ditulis,
             // kosongkan kolom-kolom master (0 s/d 16)
             if (isset($masterWritten[$trxCode])) {
-                foreach ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] as $idx) {
+                foreach ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,] as $idx) {
                     $outputRow[$idx] = '';
                 }
             } else {
