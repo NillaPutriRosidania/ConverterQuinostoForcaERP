@@ -3,6 +3,8 @@
     namespace App\Http\Controllers;
 
     use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Log;
+
 
     class QuinosConverterController extends Controller
     {
@@ -124,30 +126,34 @@
             }
 
             $headers = [
-                'AD_Org_ID[Name]',                              // 0
-                'FORCA_TransactionType',                        // 1
-                'Business Partner',                             // 2
-                'Description',                                  // 3
-                'DateOrdered',                                  // 4
-                'FORCA_POSID',                                  // 5
-                'Total Discount',                               // 6
-                'Description Discount',                         // 7
-                'Service Charge',                               // 8
-                'Rounding',                                     // 9
-                'C_BankAccount_ID[Value]',                      // 10
-                'C_Project_ID[Value]',                          // 11
-                'C_Activity_ID[Value]',                         // 12
-                'M_Warehouse_ID[Value]',                        // 13
-                'SalesRep_ID[Name]',                            // 14
-                'IsActive',                                     // 15
-                'FORCA_ImportSalesPOSLine>AD_Org_ID[Name]',     // 16
-                'Line No',                                      // 17
-                'FORCA_ImportSalesPOSLine>M_Product_ID[Value]', // 18
-                'FORCA_ImportSalesPOSLine>PriceActual',         // 19
-                'FORCA_ImportSalesPOSLine>QtyOrdered',          // 20
-                'FORCA_ImportSalesPOSLine>C_Tax_ID[Name]',      // 21
-                'FORCA_ImportSalesPOSLine>IsActive',            // 22
-            ];
+            'AD_Org_ID[Name]',
+            'FORCA_TransactionType',
+            'C_BPartner_ID[Value]',
+            'Description',
+            'DateOrdered',
+            'FORCA_POSID',
+            'total_discount',
+            'FORCA_DescriptionDisc',
+            'FORCA_ServiceCharge',
+            'FORCA_RoundingAmt',
+            'C_BankAccount_ID[Value]',
+            'C_Project_ID[Value]',
+            'C_Activity_ID[Value]',
+            'M_Warehouse_ID[Value]',
+            'SalesRep_ID[Name]',
+            'C_Currency_ID',
+            'IsActive',
+            'C_DocType_ID[Name]',
+            'M_PriceList_ID[Name]',
+            'C_PaymentTerm_ID[Value]',
+            'FORCA_ImportSalesPOSLine>AD_Org_ID[Name]',
+            'FORCA_ImportSalesPOSLine>LineNo',
+            'FORCA_ImportSalesPOSLine>M_Product_ID[Value]',
+            'FORCA_ImportSalesPOSLine>PriceActual',
+            'FORCA_ImportSalesPOSLine>QtyOrdered',
+            'FORCA_ImportSalesPOSLine>C_Tax_ID[Name]',
+            'FORCA_ImportSalesPOSLine>IsActive',
+        ];
 
             $productMap = [
                 'Hot Americano'           => '1001802_Americano (Hot) - KOPI KILEN (DRINKS)',
@@ -279,7 +285,9 @@
                         $description = 'an ' . $customer . ' (Migrasi Quinos Transaksi ' . $tanggalIndo . ')';
                     }
                 }
-                $productId = $productMap[$nameRaw] ?? $nameRaw;
+                $productFull = $productMap[$nameRaw] ?? $nameRaw;
+                $productId = explode('_', $productFull)[0];
+
 
                 $outputRow = [
                     0  => 'Head Office',
@@ -297,17 +305,21 @@
                     12 => '1000006',
                     13 => 'KOPI KILEN SQ - JAKARTA',
                     14 => 'Ely Ruknia Sari',
-                    15 => 'Y',
-                    16 => '*',
-                    17 => $lineNo,
-                    18 => $productId,
-                    19 => $unitPrice,
-                    20 => $qty,
-                    21 => 'PB1 10%',
-                    22 => 'Y',
+                    15 => '303',
+                    16 => 'Y',
+                    17 => 'Food and Beverage',
+                    18 => 'Sales Exclude Tax',
+                    19 => '1. Immediate',
+                    20 => 'Head Office',
+                    21 => $lineNo,
+                    22 => $productId,
+                    23 => $unitPrice,
+                    24 => $qty,
+                    25 => 'PB1 10%',
+                    26 => 'Y',
                 ];
                 if (isset($masterWritten[$trxCode])) {
-                    foreach ([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] as $idx) {
+                    foreach ([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19] as $idx) {
                         $outputRow[$idx] = '';
                     }
                 } else {
