@@ -50,6 +50,58 @@ class QuinosConverterSQController extends Controller
         return false;
     }
 
+    private function isTakeAwayZeroRow(array $row): bool
+    {
+        $name = trim($row['name'] ?? '');
+        $nameUpper = strtoupper($name);
+
+        $price = (float) ($row['price'] ?? 0);
+
+        $code = trim($row['code'] ?? '');
+        $codeUpper = strtoupper($code);
+
+        // 1. Description HARUS berawalan "Take Away"
+        if (stripos($name, 'Take Away') !== 0) {
+            return false;
+        }
+
+        // 2. Code HARUS diawali "TKW" tapi BUKAN persis "TKW"
+        if (
+            strpos($codeUpper, 'TKW') !== 0 // harus prefix TKW
+            || $codeUpper === 'TKW'         // tapi tidak boleh persis TKW
+        ) {
+            return false;
+        }
+
+        // 3. Price harus 0
+        if ($price != 0.0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isTakeAwayItem(array $row): bool
+    {
+        $name = trim($row['name'] ?? '');
+        $code = strtoupper(trim($row['code'] ?? ''));
+
+        // Description harus diawali "Take Away"
+        if (stripos($name, 'Take Away') !== 0) {
+            return false;
+        }
+
+        // Code harus diawali TKW (TKWH001, TKWI002, dst)
+        if (strpos($code, 'TKW') !== 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
     private function normalizeProductName(string $name): string
     {
         return trim(str_replace('#', '', $name));
@@ -467,6 +519,8 @@ class QuinosConverterSQController extends Controller
 
         // 3a. BACA SEMUA BARIS DETAIL KE MEMORI
         $rawRows = [];
+        
+
         while (($row = fgetcsv($handleDetail)) !== false) {
             if (! isset($row[$trxIndex])) {
                 continue;
@@ -477,12 +531,19 @@ class QuinosConverterSQController extends Controller
                 continue;
             }
 
+            $codeIndex = array_search('Code', $inputHeader);
+            if ($codeIndex === false) {
+                fclose($handleDetail);
+                abort(500, 'Kolom "Code" tidak ditemukan di file detail.');
+            }
+
             $nameRaw  = trim($row[$nameIndex]  ?? '');
             $qtyRaw   = trim($row[$qtyIndex]   ?? '0');
             $priceRaw = trim($row[$priceIndex] ?? '0');
             $categoryRaw   = trim($row[$catIndex] ?? '');
             $departmentRaw = trim($row[$deptIndex] ?? '');
             $customRaw = trim($row[$custIndex] ?? '');
+            $codeRaw = trim($row[$codeIndex] ?? '');
 
             // buang koma ribuan
             $qtyStr   = str_replace(',', '', $qtyRaw);
@@ -499,6 +560,7 @@ class QuinosConverterSQController extends Controller
                 'category'   => $categoryRaw,
                 'department' => $departmentRaw,
                 'customer' => $customRaw,
+                'code'       => $codeRaw,
             ];
         }
         fclose($handleDetail);
@@ -520,6 +582,10 @@ class QuinosConverterSQController extends Controller
             // hitung unit price
             $unitPrice = $qty != 0 ? $price / $qty : 0;
 
+            // HAPUS TAKE AWAY (TKW, price = 0)
+            if ($this->isTakeAwayZeroRow($current)) {
+                continue;
+            }
 
             if ($this->isModifierRow($current, $modifierNotesUpper)) {
                     continue;
@@ -546,12 +612,19 @@ class QuinosConverterSQController extends Controller
                         continue;
                     }
 
-                    // 3. ketemu combo baru → stop (hindari nested combo)
+                    // 3. TAKE AWAY (Code awalan TKW & Description awalan Take Away)
+                    //    -> TIDAK masuk anak combo, TAPI combo lanjut scan item berikutnya
+                    if ($this->isTakeAwayItem($next)) {
+                        $j++;
+                        continue;
+                    }
+
+                    // 4. ketemu combo baru → stop (hindari nested combo)
                     if (in_array($next['name'], $comboNames, true)) {
                         break;
                     }
 
-                    // 4. item valid → bagian dari combo
+                    // 5. item valid → bagian dari combo
                     $childrenIndex[] = $j;
                     $j++;
                 }
@@ -567,10 +640,11 @@ class QuinosConverterSQController extends Controller
                         $child = $rawRows[$idxChild];
 
                         $logicalRows[] = [
-                            'trx'       => $trxCode,          // invoice sama
+                            'trx'       => $trxCode,
                             'name'      => trim($child['name']),
                             'qty'       => $child['qty'] > 0 ? $child['qty'] : $qty,
-                            'unitPrice' => $unitPriceChild,   // harga dibagi rata
+                            'unitPrice' => $unitPriceChild,
+                            'customer'  => $child['customer'] ?? '',
                         ];
                     }
                 }
@@ -581,6 +655,7 @@ class QuinosConverterSQController extends Controller
                 // combo header tidak dimasukkan
                 continue;
             }
+
 
 
             // 3) BUKAN MODIFIER & BUKAN PAKET → MASUK LANGSUNG
