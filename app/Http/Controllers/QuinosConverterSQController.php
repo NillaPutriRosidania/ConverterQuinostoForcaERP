@@ -774,8 +774,18 @@ class QuinosConverterSQController extends Controller
             'Paper Bag Kilen'                          => '1002214_Paper Bag Kilen - KOPI KILEN PERLENGKAPAN',
             'Spunbond Kilen'                           => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
             'Spunbond Bag Kilen'                       => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
-            'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
+            // 'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
             'TAKE AWAY HOT'                            => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+            'Take Away Hot'            => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+'Take Away Iced'           => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
+'Take Away Bowl'           => '1000819_Take Away Snack - KOPI KILEN (MEALS)',
+'Take Away Lunch Box'      => '1000820_Take Away Food - KOPI KILEN (MEALS)',
+
+'Take Away Hot 08 Oz'      => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+'Take Away Cup Hot 8 Oz'   => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+
+'Take Away Iced 12 Oz'     => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
+'Take Away Cup Iced 12 Oz' => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
         ];
 
 
@@ -785,13 +795,8 @@ class QuinosConverterSQController extends Controller
 
         $temp = fopen('php://temp', 'r+');
         fputcsv($temp, $headers);
-
-        // penanda apakah Trx Code ini sudah pernah ditulis (untuk kosongkan kolom header baris berikutnya)
         $masterWritten = [];
-        // Line No per Trx Code
         $lineNoByTrx   = [];
-
-        // bulan indonesia untuk format tanggal di Description
         $bulanIndo = [
             1  => 'Januari',
             2  => 'Februari',
@@ -808,21 +813,17 @@ class QuinosConverterSQController extends Controller
         ];
 
         foreach ($logicalRows as $row) {
-            $trxCode   = $row['trx'];        // Invoice
+            $trxCode   = $row['trx'];
             $nameRaw   = $row['name'];
             $qty       = (float) $row['qty'];
             $unitPrice = (float) $row['unitPrice'];
             $customer = $current['customer'];
-
-            // hitung Line No per Trx Code: 10, 20, 30, ...
             if (! isset($lineNoByTrx[$trxCode])) {
                 $lineNoByTrx[$trxCode] = 10;
             } else {
                 $lineNoByTrx[$trxCode] += 10;
             }
             $lineNo = $lineNoByTrx[$trxCode];
-
-            // summary by Trx Code (Transaction #)
             $sum = $summaryMap[$trxCode] ?? [
                 'date'     => '',
                 'discount' => '0',
@@ -833,16 +834,13 @@ class QuinosConverterSQController extends Controller
 
             $discountAmount = (float) $sum['discount'];
 
-            // Description Discount
             $descriptionDiscount = $discountAmount == 0.0 ? '' : 'Diskon';
 
-            // Description (pakai customer + tanggal Indo)
             $description = '';
             $tanggalIndo = '';
             $bulanText   = '';
 
             if ($sum['date'] !== '') {
-                // sum['date'] format: Y-m-d
                 [$year, $month, $day] = explode('-', $sum['date']);
                 $monthNum  = (int) $month;
                 $bulanText = $bulanIndo[$monthNum] ?? $month;
@@ -858,8 +856,6 @@ class QuinosConverterSQController extends Controller
                     $description = 'an ' . $customer . ' (Migrasi Quinos Transaksi ' . $tanggalIndo . ')';
                 }
             }
-
-            // product ID: kalau tidak ada di map, pakai nama asli dari Quinos
             $cleanName = $this->normalizeProductName($nameRaw);
             $productId = $productMap[$cleanName] ?? $cleanName;
             $productTrim = explode('_', $productId)[0];
