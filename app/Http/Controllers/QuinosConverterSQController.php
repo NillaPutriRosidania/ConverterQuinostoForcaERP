@@ -497,6 +497,7 @@ class QuinosConverterSQController extends Controller
             'TANPA KORNET',
             'JGN BERMINYAK',
             'LI LS',
+            'GK PKE SAYUR',
         ];
 
         // buat versi uppercase supaya cocok dengan strtoupper($name)
@@ -752,7 +753,10 @@ class QuinosConverterSQController extends Controller
             'V60 Toraja Sapan (Hot)'                   => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
             'Daily Brew(V-60) Iced (Toraja Sa'         => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
             'V60 Toraja Sapan (Iced)'                  => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
-            
+            'DailyBrewV60'                             => '1002484_Daily Brew V60 - Kopi Kilen',
+            'Aceh Gayo 250 Gr'                         => '1002485_Aceh Gayo 250 Gr - Kopi Kilen',
+            'Kopi Kilen Blend 250g'                    => '1002486_Kopi Kilen Blend 250g - Kopi Kilen',
+
             'Espresso'                                 => '1001823_Esspreso - KOPI KILEN (DRINKS)',
             'Espresso Shot'                            => '1002337_Add on Essppresso - KOPI KILEN (DRINKS)',
             'Flat White (Hot)'                         => '1001824_Flat White - KOPI KILEN (DRINKS)',
@@ -793,7 +797,13 @@ class QuinosConverterSQController extends Controller
             'Vanilla Latte (Hot)'                      => '1001842_Vanilla Latte (Hot) - KOPI KILEN (DRINKS)',
             'Vanilla Latte (Iced)'                     => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
             'Vanila Latte'                             => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
-            'Milk'                                     => '1002017_Milk (Ice) - KOPI KILEN (DRINKS)',
+            'Milk'                                     => '1001512_Oat Milk - KOPI KILEN (DRINKS)',
+            'Oat Milk'                                 => '1001512_Oat Milk - KOPI KILEN (DRINKS)',
+            'Oat Milk Ice'                             => '1001512_Oat Milk - KOPI KILEN (DRINKS)',
+            'Oat Milk Hot'                             => '1001512_Oat Milk - KOPI KILEN (DRINKS)',
+            'Soy Milk'                                 => '1001511_Soy Milk - KOPI KILEN (DRINKS)',
+            'Soy Milk Ice'                             => '1001511_Soy Milk - KOPI KILEN (DRINKS)',
+            'Soy Milk Hot'                             => '1001511_Soy Milk - KOPI KILEN (DRINKS)',
             
 
             // MEALS
@@ -814,7 +824,7 @@ class QuinosConverterSQController extends Controller
             'French Fries'                             => '1001779_French Fries - KOPI KILEN (MEALS)',
             'Internet Goreng Kilen'                    => '1001780_Internet Goreng Kilen - KOPI KILEN (MEALS)',
             'Internet Rebus'                           => '1001781_Internet Rebus - KOPI KILEN (MEALS)',
-            'Internet Rebus Kilen'                           => '1001781_Internet Rebus - KOPI KILEN (MEALS)',
+            'Internet Rebus Kilen'                     => '1001781_Internet Rebus - KOPI KILEN (MEALS)',
             'Lontong Sayur'                            => '1001782_Lontong Sayur - KOPI KILEN (MEALS)',
             'Mie Ayam Pangsit'                         => '1001783_Mie Ayam - KOPI KILEN (MEALS)',
             'Mie Goreng Ayam Betutu'                   => '1001784_Mie Goreng Ayam Betutu - KOPI KILEN (MEALS)',
@@ -834,7 +844,9 @@ class QuinosConverterSQController extends Controller
             'Ubi Goreng'                               => '1001797_Ubi Goreng - KOPI KILEN (MEALS)',
             'Kwetiau Goreng'                           => '1002296_Kwetiau Goreng - KOPI KILEN (MEALS)',
             'Kwetiau Sapi'                             => '1002311_Kwetiau Goreng Sapi - KOPI KILEN (MEALS)',
+            'Kwetiua Sapi'                             => '1002311_Kwetiau Goreng Sapi - KOPI KILEN (MEALS)',
             'Roti Bakar'                               => '1001788_Roti Bakar - KOPI KILEN (MEALS)',
+            'Sop Sapi'                                 => '1002487_Sop Sapi - Kopi Kilen',
             'Toast'                                    => '1001796_Toast Kaya Butter - KOPI KILEN (MEALS)',
 
             // Add On
@@ -846,12 +858,15 @@ class QuinosConverterSQController extends Controller
             'Add on Rice'                              => '1002327_Add Rice - KOPI KILEN (MEALS)',
             'Add On Chicken'                           => '1002326_Add On Chicken - KOPI KILEN (MEALS)',
             'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
+            'Add On Food'                              => '1002482_Add On Food - Kopi Kilen',
+            'Additional Food'                          => '1002482_Add On Food - Kopi Kilen',
+            'Add Syrup'                                => '1002483_Add on Syrup - Kopi Kilen',
+            'Addtional Syrup'                          => '1002483_Add on Syrup - Kopi Kilen',
 
             // Perlengkapan
             'Paper Bag Kilen'                          => '1002214_Paper Bag Kilen - KOPI KILEN PERLENGKAPAN',
             'Spunbond Kilen'                           => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
             'Spunbond Bag Kilen'                       => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
-            'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
             'TAKE AWAY HOT'                            => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
             'Take Away Iced'                           => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
             'Take Away Bowl'                           => '1000819_Take Away Snack - KOPI KILEN (MEALS)',
