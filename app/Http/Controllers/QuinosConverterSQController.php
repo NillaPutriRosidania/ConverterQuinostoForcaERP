@@ -487,6 +487,7 @@ class QuinosConverterSQController extends Controller
             'DDR',
             'PDS  MNS',
             'TANPA KORNET TANPA SAYUR',
+            'TANPA SAYUR',
             'SEDENG',
             'TDK PEDES',
             'STGH MTG',
@@ -792,6 +793,7 @@ class QuinosConverterSQController extends Controller
             'Vanilla Latte (Hot)'                      => '1001842_Vanilla Latte (Hot) - KOPI KILEN (DRINKS)',
             'Vanilla Latte (Iced)'                     => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
             'Vanila Latte'                             => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
+            'Milk'                                     => '1002017_Milk (Ice) - KOPI KILEN (DRINKS)',
             
 
             // MEALS
@@ -851,6 +853,13 @@ class QuinosConverterSQController extends Controller
             'Spunbond Bag Kilen'                       => '1002213_Paper Bag Hitam Spunbond - KOPI KILEN PERLENGKAPAN',
             'Add On Beef'                              => '1002325_Add On Beef - KOPI KILEN (MEALS)',
             'TAKE AWAY HOT'                            => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+            'Take Away Iced'                           => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
+            'Take Away Bowl'                           => '1000819_Take Away Snack - KOPI KILEN (MEALS)',
+            'Take Away Lunch Box'                      => '1000820_Take Away Food - KOPI KILEN (MEALS)',
+            'Take Away Hot 08 Oz'                      => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+            'Take Away Cup Hot 8 Oz'                   => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+            'Take Away Iced 12 Oz'                     => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
+            'Take Away Cup Iced 12 Oz'                 => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
         ];
 
 
