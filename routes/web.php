@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\HitungBahanBakuController;
+use App\Http\Controllers\PosIdMaterialController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuinosConverterController;
 use App\Http\Controllers\QuinosConverterLantai12Controller;
 use App\Http\Controllers\QuinosConverterSQController;
 use App\Http\Controllers\GresikSalesController;
+use App\Http\Controllers\RevenueController;
+use App\Http\Controllers\ArchiveController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,3 +42,40 @@ Route::get('/sales/result', [GresikSalesController::class, 'result'])
 
 Route::post('/sales/convert-bom', [GresikSalesController::class, 'convertToBom'])
     ->name('sales.convertBom');
+
+    Route::get('/revenue/upload', [RevenueController::class, 'upload'])->name('revenue.upload');
+Route::post('/revenue/run', [RevenueController::class, 'run'])->name('revenue.run');Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
+
+Route::post('/archive/upload', [ArchiveController::class, 'upload'])->name('archive.upload');
+
+Route::get('/archive/browse/{branch?}/{year?}/{month?}', [ArchiveController::class, 'browse'])
+    ->name('archive.browse');
+
+Route::get('/archive-download/{path}', [ArchiveController::class, 'download'])
+    ->where('path', '.*')
+    ->name('archive.download');
+
+Route::post('/archive-delete', [ArchiveController::class, 'delete'])
+    ->name('archive.delete');
+
+    
+Route::get('/bahan-baku/upload', [HitungBahanBakuController::class, 'rawUpload'])->name('raw.upload');
+Route::post('/bahan-baku/process', [HitungBahanBakuController::class, 'rawProcess'])->name('raw.process');
+Route::get('/bahan-baku/result', [HitungBahanBakuController::class, 'rawResult'])->name('raw.result');
+Route::get('/bahan-baku/download', [HitungBahanBakuController::class, 'rawDownload'])->name('raw.download');
+
+
+Route::get('/posid-material', [PosIdMaterialController::class, 'upload'])
+    ->name('posidMaterial.upload');
+
+Route::post('/posid-material/process', [PosIdMaterialController::class, 'process'])
+    ->name('posidMaterial.process');
+
+Route::get('/posid-material/search', [PosIdMaterialController::class, 'search'])
+    ->name('posidMaterial.search');
+
+Route::get('/posid-material/result', [PosIdMaterialController::class, 'result'])
+    ->name('posidMaterial.result');
+
+Route::get('/posid-material/export', [PosIdMaterialController::class, 'export'])
+    ->name('posidMaterial.export');

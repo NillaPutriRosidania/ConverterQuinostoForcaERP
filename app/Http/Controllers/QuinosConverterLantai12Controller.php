@@ -85,8 +85,6 @@ class QuinosConverterLantai12Controller extends Controller
             'Creamy Dopio' => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
             'Mochalatte' => '1001837_Mocha Latte (Ice) - KOPI KILEN (DRINKS)',
             'Flat White' => '1001824_Flat White - KOPI KILEN (DRINKS)',
-            'V60' => 'V60',
-
             'Cold White Original' => '1001683_Cold White Original - KOPI KILEN (DRINKS)',
             'Cold White Coconut' => '1001685_Cold White Coconut - KOPI KILEN (DRINKS)',
             'Cold White Caramel' => '1001684_Cold White Caramel - KOPI KILEN (DRINKS)',
@@ -107,10 +105,6 @@ class QuinosConverterLantai12Controller extends Controller
             'Pokka Green Tea' => '1001687_Pokka Green Tea - KOPI KILEN (DRINKS)',
             'Coca-Cola' => '1001698_Coca Cola @250Ml - KOPI KILEN (DRINKS)',
             'Air Mineral' => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
-
-            'Add On Lemon' => 'Add On Lemon',
-            'Add on Lontong' => 'Add on Lontong',
-
             'Tahu Lada Garam' => '1001794_Tahu Lada Garam - KOPI KILEN (MEALS)',
             'Tahu Isi' => '1001793_Tahu Isi Sayur - KOPI KILEN (MEALS)',
             'French Fries' => '1001779_French Fries - KOPI KILEN (MEALS)',
@@ -149,6 +143,10 @@ class QuinosConverterLantai12Controller extends Controller
             'Tempe goreng' => '1001795_Tempe Goreng - KOPI KILEN (MEALS)',
             'Chocolatte' => '1001813_Chocolate (Ice) - KOPI KILEN (DRINKS)',
             'Cold White Brew Sweet' => '1001686_Cold Brew Sweet - KOPI KILEN (DRINKS)',
+                        'Add on Lontong' => '1002328_Add Ketupat - KOPI KILEN (MEALS)',
+                                               'Add On Lemon' => '1002336_Add on Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
+                                   'V60' => '1001819_Daily Brew(V-60) Hot (Aceh Gayo) - KOPI KILEN (DRINKS)',
+                                                                      'Indomie Kornet' => '1001781_Internet Rebus - KOPI KILEN (MEALS)',
             
             
         ];

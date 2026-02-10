@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sales Upload</title>
+    <title>Perhitungan Bahan Baku</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
@@ -24,7 +24,7 @@
 
         .wrapper {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             padding: 16px;
         }
 
@@ -72,7 +72,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 8px;
+            padding: 8px 10px;
             border-radius: 8px;
             font-size: 12px;
         }
@@ -137,8 +137,14 @@
             transform: translateX(-2px);
         }
 
-        .back-icon {
-            font-size: 14px;
+        .error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 12px;
         }
     </style>
 </head>
@@ -147,34 +153,40 @@
     <div class="wrapper">
         <div class="card">
             <a href="{{ route('welcome') }}" class="back-btn">
-                <span class="back-icon">←</span> Kembali
+                <span>←</span> Kembali
             </a>
 
-            <h1>Sales Upload</h1>
-            <div class="subtitle">Upload beberapa file transaksi sekaligus</div>
+            <h1>Perhitungan Bahan Baku</h1>
+            <div class="subtitle">Upload file BOM (Excel) untuk menghitung total pemakaian bahan baku</div>
 
-            <!-- FORM -->
-            <form action="{{ route('sales.process') }}" method="POST" enctype="multipart/form-data">
+            @if ($errors->any())
+                <div class="error">
+                    <b>Terjadi error:</b>
+                    <ul style="margin:8px 0 0 18px;">
+                        @foreach ($errors->all() as $e)
+                            <li>{{ $e }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('raw.process') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="field-group">
-                    <input type="file" name="files[]" id="fileInput" class="file-input" multiple accept=".csv,.txt"
-                        required>
+                    <input type="file" name="file" id="fileInput" class="file-input" accept=".xlsx,.xls" required>
                 </div>
 
-                <!-- PREVIEW FILE -->
                 <div id="filePreview" class="file-preview" style="display:none;"></div>
 
                 <div class="btn-row">
-                    <button type="submit">📤 Upload & Hitung Sales</button>
+                    <button type="submit">📊 Hitung Pemakaian</button>
                 </div>
 
                 <div class="footnote">
-                    File yang dipilih akan ditampilkan sebelum diproses.
+                    Pastikan file memiliki kolom: <b>PENYUSUN</b> & <b>HASIL (GRAMASI X PENJULAN)</b>
                 </div>
-
             </form>
-
         </div>
     </div>
 
@@ -184,34 +196,29 @@
 
         fileInput.addEventListener('change', () => {
             preview.innerHTML = '';
-            const files = fileInput.files;
+            const file = fileInput.files[0];
 
-            if (files.length === 0) {
+            if (!file) {
                 preview.style.display = 'none';
                 return;
             }
 
             preview.style.display = 'block';
 
-            Array.from(files).forEach(file => {
-                const item = document.createElement('div');
-                item.className = 'file-item';
+            const item = document.createElement('div');
+            item.className = 'file-item';
 
-                const sizeKB = (file.size / 1024).toFixed(1);
-                const sizeText = sizeKB > 1024 ?
-                    (sizeKB / 1024).toFixed(2) + ' MB' :
-                    sizeKB + ' KB';
+            const sizeKB = (file.size / 1024).toFixed(1);
+            const sizeText = sizeKB > 1024 ? (sizeKB / 1024).toFixed(2) + ' MB' : sizeKB + ' KB';
 
-                item.innerHTML = `
-                    <div class="file-name">📄 ${file.name}</div>
-                    <div class="file-size">${sizeText}</div>
-                `;
+            item.innerHTML = `
+                <div class="file-name">📄 ${file.name}</div>
+                <div class="file-size">${sizeText}</div>
+            `;
 
-                preview.appendChild(item);
-            });
+            preview.appendChild(item);
         });
     </script>
-
 </body>
 
 </html>

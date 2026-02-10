@@ -155,17 +155,20 @@
                 <thead>
                     <tr>
                         <th>Product ID</th>
+                        <th>Nama Produk</th>
                         <th style="text-align:right;">Total Qty</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($data as $product => $total)
+                    @foreach ($data as $row)
                         <tr>
-                            <td>{{ $product }}</td>
-                            <td class="qty">{{ number_format((int) $total) }}</td>
+                            <td>{{ $row['code'] }}</td>
+                            <td>{{ $row['name'] }}</td>
+                            <td class="qty">{{ number_format($row['qty']) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
+
             </table>
             <!-- FOOTER (DITAMBAH 1 BUTTON) -->
             <div class="footer-row">
