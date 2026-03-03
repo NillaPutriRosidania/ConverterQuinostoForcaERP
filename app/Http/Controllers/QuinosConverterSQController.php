@@ -99,6 +99,15 @@ class QuinosConverterSQController extends Controller
         return (float) round($value, 0, PHP_ROUND_HALF_UP);
     }
 
+        private function shouldPb0(array $r): bool
+        {
+            if (!empty($r['is_combo_child'])) return false;
+
+            $category = strtoupper(trim($r['category'] ?? ''));
+            $name     = trim($r['name'] ?? '');
+
+            return ($category === 'EXTRA' || $name === 'Paper Bag Kilen');
+        }
     public function convert(Request $request)
     {
         $request->validate([
@@ -798,9 +807,7 @@ class QuinosConverterSQController extends Controller
             $categoryUpper = strtoupper(trim($r['category'] ?? ''));
             $isComboChild  = (bool)($r['is_combo_child'] ?? false);
 
-            $taxName = (!$isComboChild && $categoryUpper === 'EXTRA')
-                ? 'PB1 0%'
-                : 'PB1 10%';
+            $taxName = $this->shouldPb0($r) ? 'PB1 0%' : 'PB1 10%';
 
             if ($taxName === 'PB1 0%' && $amount != 0.0) {
                 $trxHasPb0[$trxCode] = true;
@@ -835,9 +842,7 @@ class QuinosConverterSQController extends Controller
             $categoryUpper = strtoupper(trim($r['category'] ?? ''));
             $isComboChild  = (bool)($r['is_combo_child'] ?? false);
 
-            $taxName = (!$isComboChild && $categoryUpper === 'EXTRA')
-                ? 'PB1 0%'
-                : 'PB1 10%';
+            $taxName = $this->shouldPb0($r) ? 'PB1 0%' : 'PB1 10%';
 
             $lineAmount = $qty * $unitPrice;
 
@@ -904,9 +909,7 @@ class QuinosConverterSQController extends Controller
             $categoryUpper = strtoupper(trim($row['category'] ?? ''));
             $isComboChild  = (bool)($row['is_combo_child'] ?? false);
 
-            $taxName = (!$isComboChild && $categoryUpper === 'EXTRA')
-                ? 'PB1 0%'
-                : 'PB1 10%';
+            $taxName = $this->shouldPb0($row) ? 'PB1 0%' : 'PB1 10%';
 
             // LineNo per trx per sheet
             if (!isset($lineNoByTrxBySheet[$targetSheetNo][$trxCode])) {
