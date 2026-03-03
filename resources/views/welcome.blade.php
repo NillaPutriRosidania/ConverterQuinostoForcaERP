@@ -443,6 +443,18 @@
                         <div class="right">Buka →</div>
                     </a>
 
+                    <a href="{{ route('revenue_journal.upload') }}" class="btn">
+                        <div class="left">
+                            <div class="icon blue">🧾</div>
+                            <div>
+                                <div class="title">Revenue Journal</div>
+                                <div class="desc">Hitung jurnal (Penjualan, Diskon, PB10, SC, Rounding) per invoice
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right">Buka →</div>
+                    </a>
+
                 </div>
             </div>
 

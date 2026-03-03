@@ -305,6 +305,8 @@ private function productMap()
         '1002703' => '1002703_Macchiato Oat Milk (Hot) - KOPI KILEN (DRINKS)',
         '1002487' => '1002487_Sop Sapi - Kopi Kilen',
         '1001792' => '1001792_Spicy Chicken Bites - KOPI KILEN (MEALS)',
+        '1002836' => '1002836_Pastry Kilen - KOPI KILEN (MEALS)',
+        '1002825' => '1002825_Iced Calamanci Black Tea - KOPI KILEN (DRINKS)',
 
 
 

@@ -181,9 +181,24 @@
 
         filterBox.addEventListener('input', () => {
             const q = filterBox.value.toLowerCase();
+
             [...select.options].forEach(opt => {
-                opt.hidden = q && !opt.text.toLowerCase().includes(q);
+                const match = opt.text.toLowerCase().includes(q);
+
+                // hide option kalau tidak cocok
+                opt.hidden = q && !match;
+
+                // ✅ AUTO SELECT semua yang match
+                if (q && match) {
+                    opt.selected = true;
+                }
             });
+            if (!q) {
+                [...select.options].forEach(opt => {
+                    opt.hidden = false;
+                    opt.selected = false;
+                });
+            }
         });
     </script>
 </body>

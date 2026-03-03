@@ -146,9 +146,9 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        <div class="card">
 
+    <div class="wrapper">
+        <div class="card">  
             <h2>Jumlah Penjualan per Produk</h2>
 
             <table>
@@ -175,6 +175,8 @@
                 <a href="{{ route('sales.upload') }}" class="back-link">
                     ← Upload ulang
                 </a>
+
+                <a href="{{ route('welcome') }}" class="back-link">🏠 Home</a>
 
                 <form action="{{ route('sales.convertBom') }}" method="POST">
                     @csrf

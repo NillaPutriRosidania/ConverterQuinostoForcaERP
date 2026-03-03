@@ -12,23 +12,52 @@ class RevenueController extends Controller
         return view('revenue.upload');
     }
 
-    public function run(Request $request)
-    {
-        $request->validate([
-            'file_mapping' => 'required|file|mimes:csv,txt',
-        ]);
+public function run(Request $request)
+{
+    $request->validate([
+        'file_mapping'   => 'required',
+        'file_mapping.*' => 'file|mimes:csv,txt',
+    ]);
 
-        $path = $request->file('file_mapping')->getRealPath();
+    $files = $request->file('file_mapping'); // array of UploadedFile
 
-        $summaryRows = $this->buildSummaryFromMappingCsv($path);
+    $allRowsByInvoice = []; // invoice => row summary
 
-        $templatePath = storage_path('app/template/template_summary.xlsx');
-        if (file_exists($templatePath)) {
-            return $this->downloadXlsxFromTemplate($templatePath, $summaryRows);
+    foreach ($files as $f) {
+        $path = $f->getRealPath();
+
+        // hasil per file (array of rows)
+        $rows = $this->buildSummaryFromMappingCsv($path);
+
+        // merge ke global
+        foreach ($rows as $r) {
+            $inv = (string)$r['Invoice'];
+            if (!isset($allRowsByInvoice[$inv])) {
+                $allRowsByInvoice[$inv] = $r;
+            } else {
+                // invoice sama → dijumlahkan
+                $allRowsByInvoice[$inv]['Subtotal']       += $r['Subtotal'];
+                $allRowsByInvoice[$inv]['Discount']       += $r['Discount'];
+                $allRowsByInvoice[$inv]['Net Sales']      += $r['Net Sales'];
+                $allRowsByInvoice[$inv]['Service Charge'] += $r['Service Charge'];
+                $allRowsByInvoice[$inv]['Tax']            += $r['Tax'];
+                $allRowsByInvoice[$inv]['Rounding']       += $r['Rounding'];
+                $allRowsByInvoice[$inv]['Total']          += $r['Total'];
+            }
         }
-
-        return $this->downloadCsv($summaryRows);
     }
+
+    // urut invoice
+    uksort($allRowsByInvoice, fn($a, $b) => (int)$a <=> (int)$b);
+
+    $summaryRows = array_values($allRowsByInvoice);
+
+    $templatePath = storage_path('app/template/template_summary.xlsx');
+    if (file_exists($templatePath)) {
+        return $this->downloadXlsxFromTemplate($templatePath, $summaryRows);
+    }
+    return $this->downloadCsv($summaryRows);
+}
 
     private function buildSummaryFromMappingCsv(string $csvPath): array
     {

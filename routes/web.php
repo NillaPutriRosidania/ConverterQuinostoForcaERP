@@ -9,6 +9,10 @@ use App\Http\Controllers\QuinosConverterSQController;
 use App\Http\Controllers\GresikSalesController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\ArchiveController;
+// use App\Http\Controllers\EbupotController;
+use App\Http\Controllers\RevenueJournalController;
+
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -79,3 +83,7 @@ Route::get('/posid-material/result', [PosIdMaterialController::class, 'result'])
 
 Route::get('/posid-material/export', [PosIdMaterialController::class, 'export'])
     ->name('posidMaterial.export');
+
+Route::get('/revenue-journal', [RevenueJournalController::class, 'upload'])->name('revenue_journal.upload');
+Route::post('/revenue-journal/run', [RevenueJournalController::class, 'run'])->name('revenue_journal.run');
+Route::get('/revenue-journal/download', [RevenueJournalController::class, 'download'])->name('revenue_journal.download');

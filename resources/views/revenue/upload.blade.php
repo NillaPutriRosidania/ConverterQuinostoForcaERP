@@ -309,10 +309,11 @@
 
                 <div class="field-group">
                     <div class="field-label">
-                        <span>File Mapping (CSV)</span>
-                        <span class="helper">Hasil convert FORCA (.csv)</span>
+                        <span>File Mapping (CSV) - bisa lebih dari 1</span>
+                        <span class="helper">Hasil convert FORCA (.csv,.xlsx)</span>
                     </div>
-                    <input type="file" name="file_mapping" accept=".csv,.txt" required class="file-input">
+                    <input type="file" name="file_mapping[]" accept=".csv,.txt,.xlsx,.xls" multiple required
+                        class="file-input">
                     <div class="file-hint">
                         File yang berisi kolom: FORCA_POSID, Total Discount, Service Charge, Rounding,
                         QtyOrdered, PriceActual, C_Tax_ID[Name].

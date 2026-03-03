@@ -212,13 +212,14 @@
 
                 'Pokka Green Tea'   => '1001687_Pokka Green Tea - KOPI KILEN (DRINKS)',
                 '# Milk'   => '1002017_Milk (Iced) - KOPI KILEN (DRINKS)',
-                '# Syrup'   => '1001537_Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
+                '# Syrup'   => '1002336_Add on Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
                 '# Shot'   => '1002337_Add on Essppresso - KOPI KILEN (DRINKS)',
                 'Flat White'   => '1001824_Flat White - KOPI KILEN (DRINKS)',
                 'V60 ( Japanessee )'   => '1001819_Daily Brew (V-60) Hot (Aceh Gayo) - KOPI KILEN (DRINKS)',
                 'Aceh Gayo Biji'   => '1001522_Gayo Biji @250 Gr - KOPI KILEN (DRINKS)',
                 'Fanta'   => '1001700_Fanta @250Ml - KOPI KILEN (DRINKS)',
                 'Toraja Sapan Bubuk'   => '1001521_Toraja Bubuk @250 Gr - KOPI KILEN (DRINKS)',
+                'Pastry Kilen' => '1002836_Pastry Kilen - KOPI KILEN (MEALS)',
                 
 
                 
