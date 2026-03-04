@@ -787,8 +787,61 @@ class QuinosConverterSQController extends Controller
         $milkAddonByParentProductId['1001814']['Oat Milk'] = $OAT_30;
         $milkAddonByParentProductId['1001814']['Soy Milk'] = $SOY_30;
 
+// =========================
+// DETECT trx MIXED MILK (LEVEL INVOICE)
+// mixed kalau: total milk-drink qty > total oat/soy qty, dan oat/soy qty > 0
+// =========================
+$milkParents = array_fill_keys(array_keys($milkAddonByParentProductId), true);
 
-        // === OUTPUT XLSX 3 SHEET ===
+$trxMilkParentQty = []; // [trx => total milk parent qty]
+$trxAltQty        = []; // [trx => total oat+soy qty]
+$trxIsMixedMilk   = []; // [trx => true]
+
+foreach ($logicalRows as $r) {
+    $trxCode = $r['trx'];
+    $qty     = (float) ($r['qty'] ?? 0);
+    if ($qty <= 0) continue;
+
+    $categoryUpper = strtoupper(trim($r['category'] ?? ''));
+    $isComboChild  = (bool)($r['is_combo_child'] ?? false);
+
+    $cleanName = $this->normalizeProductName($r['name'] ?? '');
+
+    // 1) hitung Oat/Soy modifier
+    if (
+        !$isComboChild
+        && $categoryUpper === 'EXTRA'
+        && in_array($cleanName, $milkModifierNames, true)
+    ) {
+        if (!isset($trxAltQty[$trxCode])) $trxAltQty[$trxCode] = 0.0;
+        $trxAltQty[$trxCode] += $qty;
+        continue;
+    }
+
+    // 2) hitung milk parent drinks (berdasarkan PID yg ada di milkAddonByParentProductId)
+    if (!$isComboChild && $categoryUpper !== 'EXTRA') {
+        $productId = $productMap[$cleanName] ?? $cleanName;
+        $parentPid = explode('_', $productId)[0];
+
+        if (isset($milkParents[$parentPid])) {
+            if (!isset($trxMilkParentQty[$trxCode])) $trxMilkParentQty[$trxCode] = 0.0;
+            $trxMilkParentQty[$trxCode] += $qty;
+        }
+    }
+}
+
+// finalize mixed flag
+foreach ($trxMilkParentQty as $trxCode => $totalMilk) {
+    $alt = (float) ($trxAltQty[$trxCode] ?? 0.0);
+
+    // mixed: ada alt dan tidak semua milk diganti alt
+    if ($alt > 0.0 && $totalMilk > $alt) {
+        $trxIsMixedMilk[$trxCode] = true;
+    }
+}
+
+
+        // === OUTPUT XLSX 4 SHEET ===
         $spreadsheet = new Spreadsheet();
 
         $sheet1 = $spreadsheet->getActiveSheet();
@@ -803,24 +856,21 @@ class QuinosConverterSQController extends Controller
         $sheet3->setTitle('Sheet 3');
         $sheet3->fromArray($headers3, null, 'A1');
 
-        $rowPtr = [
-            1 => 2,
-            2 => 2,
-            3 => 2,
-        ];
+        // Sheet 4: invoice mixed milk (pakai format Sheet 1/2 agar bisa import)
+        $sheet4 = $spreadsheet->createSheet();
+        $sheet4->setTitle('Sheet 4');
+        $sheet4->fromArray($headers12, null, 'A1');
 
-        $masterWrittenBySheet = [
-            1 => [],
-            2 => [],
-            3 => [],
-        ];
+        $sheet5 = $spreadsheet->createSheet();
+        $sheet5->setTitle('Sheet 5');
+        $sheet5->fromArray($headers3, null, 'A1'); // sama seperti Sheet 3
 
-        $lineNoByTrxBySheet = [
-            1 => [],
-            2 => [],
-            3 => [],
-        ];
+        $rowPtr = [1=>2,2=>2,3=>2,4=>2,5=>2];
 
+        $masterWrittenBySheet = [1=>[],2=>[],3=>[],4=>[],5=>[]];
+
+        $lineNoByTrxBySheet = [1=>[],2=>[],3=>[],4=>[],5=>[]];
+        
         $bulanIndo = [
             1  => 'Januari',
             2  => 'Februari',
@@ -857,6 +907,18 @@ class QuinosConverterSQController extends Controller
                 $trxHasPb0[$trxCode] = true;
             }
         }
+        // =========================
+        // ORIGIN sheet by trx (1/2/3) sebelum dipindah ke sheet 4/5
+        // =========================
+        $originSheetByTrx = [];
+
+        foreach ($invoiceFlags as $trxCode => $flags) {
+            if (!($trxHasPb0[$trxCode] ?? false)) {
+                $originSheetByTrx[$trxCode] = 1;
+            } else {
+                $originSheetByTrx[$trxCode] = ($flags['has_discount'] ? 3 : 2);
+            }
+        }
 
         // =========================================================
         // DISCOUNT SPLIT (HANYA SHEET 3):
@@ -872,14 +934,15 @@ class QuinosConverterSQController extends Controller
 
             $flags = $invoiceFlags[$trxCode] ?? ['has_extra_or_ta' => false, 'has_discount' => false];
 
-            // routing pakai trxHasPb0 dulu
-            if (!($trxHasPb0[$trxCode] ?? false)) {
-                $targetSheetNo = 1;
+            $origin = $originSheetByTrx[$trxCode] ?? 1;
+
+            if ($trxIsMixedMilk[$trxCode] ?? false) {
+                $targetSheetNo = ($origin === 3) ? 5 : 4;
             } else {
-                $targetSheetNo = $flags['has_discount'] ? 3 : 2;
+                $targetSheetNo = $origin;
             }
 
-            if ($targetSheetNo !== 3) {
+            if ($targetSheetNo !== 3 && $targetSheetNo !== 5) {
                 continue;
             }
 
@@ -945,11 +1008,12 @@ class QuinosConverterSQController extends Controller
 
             $flags = $invoiceFlags[$trxCode] ?? ['has_extra_or_ta' => false, 'has_discount' => false];
 
-            // routing FIX: kalau ga ada PB1 0% line => Sheet 1
-            if (!($trxHasPb0[$trxCode] ?? false)) {
-                $targetSheetNo = 1;
+            $origin = $originSheetByTrx[$trxCode] ?? 1;
+
+            if ($trxIsMixedMilk[$trxCode] ?? false) {
+                $targetSheetNo = ($origin === 3) ? 5 : 4;
             } else {
-                $targetSheetNo = $flags['has_discount'] ? 3 : 2;
+                $targetSheetNo = $origin;
             }
 
             $categoryUpper = strtoupper(trim($row['category'] ?? ''));
@@ -1023,7 +1087,7 @@ class QuinosConverterSQController extends Controller
             $disc10Master = $totalDiscMaster;
             $disc0Master  = ''; // default kosong untuk sheet 1 & 2
 
-            if ($targetSheetNo === 3) {
+            if ($targetSheetNo === 3 || $targetSheetNo === 5) {
                 $split = $discSplitMap[$trxCode] ?? ['disc10' => $totalDiscMaster, 'disc0' => 0.0];
                 $disc10Master = (float) ($split['disc10'] ?? 0.0);
                 $disc0Master  = (float) ($split['disc0'] ?? 0.0);
@@ -1034,7 +1098,7 @@ class QuinosConverterSQController extends Controller
 
         $descDisc = ($disc10Master != 0.0) ? 'Diskon' : '';
 
-        if ($targetSheetNo === 3) {
+        if ($targetSheetNo === 3 || $targetSheetNo === 5) {
             // SHEET 3 (ADA DiscNoTax)
             $outputRow = [
                 'Head Office',            // 0
@@ -1101,7 +1165,7 @@ class QuinosConverterSQController extends Controller
 
             // Blank master columns kalau trx sudah pernah ditulis di sheet itu
             if (isset($masterWrittenBySheet[$targetSheetNo][$trxCode])) {
-                $maxMasterIdx = ($targetSheetNo === 3) ? 20 : 19;
+                $maxMasterIdx = ($targetSheetNo === 3 || $targetSheetNo === 5) ? 20 : 19;
                 foreach (range(0, $maxMasterIdx) as $idx) {
                     $outputRow[$idx] = '';
                 }
@@ -1109,12 +1173,16 @@ class QuinosConverterSQController extends Controller
                 $masterWrittenBySheet[$targetSheetNo][$trxCode] = true;
             }
 
-            $ws = ($targetSheetNo === 1) ? $sheet1 : (($targetSheetNo === 2) ? $sheet2 : $sheet3);
+            $ws = ($targetSheetNo === 1) ? $sheet1
+                : (($targetSheetNo === 2) ? $sheet2
+                : (($targetSheetNo === 3) ? $sheet3
+                : (($targetSheetNo === 4) ? $sheet4
+                : $sheet5)));
             $ws->fromArray($outputRow, null, 'A' . $rowPtr[$targetSheetNo]);
             $rowPtr[$targetSheetNo]++;
         }
 
-        $filename = 'Mapping_Quinos_3Sheets_' . date('Ymd_His') . '.xlsx';
+        $filename = 'Mapping_Quinos_5Sheets_' . date('Ymd_His') . '.xlsx';
         $tmpPath = storage_path('app/' . $filename);
 
         $writer = new Xlsx($spreadsheet);
