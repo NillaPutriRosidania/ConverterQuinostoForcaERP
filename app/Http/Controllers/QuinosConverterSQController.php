@@ -678,71 +678,115 @@ class QuinosConverterSQController extends Controller
             'Take Away Cup Hot 8 Oz'                   => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
             'Take Away Iced 12 Oz'                     => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
             'Take Away Cup Iced 12 Oz'                 => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
-            'Add On Lemon Juice Syrup 1L' => '1002336_Add on Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
-            'Milk' => '1002720_Add On Milk - KOPI KILEN (DRINKS)',
-            'Add On Food' => '1002482_Add On Food - Kopi Kilen',
-            'Additional Food' => '1002482_Add On Food - Kopi Kilen',
-            'Addtional Syrup' => '1002483_Add on Syrup - Kopi Kilen',
-            'Sanqua Mineral Water 330 Ml' => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
-            'Add on Essppresso'                   => '1002337_Add on Essppresso - KOPI KILEN (DRINKS)',
-            'Aren Latte Fresh Milk (Iced)'        => '1001805_Aren Latte Ice - KOPI KILEN (DRINKS)',
-            'Esspreso'                            => '1001823_Esspreso - KOPI KILEN (DRINKS)',
-            'Aren Latte Fresh Milk (Hot)'         => '1001804_Aren Latte Hot - KOPI KILEN (DRINKS)',
-            'Creamy Dopio Espresso (Iced)'        => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
-            'Add on Caramel Syrup Delifru'        => '1002727_Add on Caramel Syrup - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Iced (Mandailin)'  => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
-            'Cup Ukuran 12 Oz'                    => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
-            'Add on Peach Syrup Delifru'          => '1002335_Add on Peach Syrup Delifru - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Hot (Trj Sapan)'   => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Iced (Trj Sapan)'  => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Add on Palm Sugar Syrup Delifru'      => '1002728_Add on Palm Sugar Syrup - KOPI KILEN (DRINKS)',
-            'Mie Ayam'                            => '1001783_Mie Ayam - KOPI KILEN (MEALS)',
-            'Lemon Tea (Iced)'                    => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',
-            'Spunbond'                            => '1002213_Spunbond - KOPI KILEN PERLENGKAPAN',
-            'Tahu Isi Sayur'                      => '1001793_Tahu Isi Sayur - KOPI KILEN (MEALS)',
-            'Macchiato (Hot)'                     => '1001835_Macchiato (Hot) - KOPI KILEN (DRINKS)',
-            'Add on Lychee Syrup Delifru'          => '1002334_Add on Lychee Syrup Delifru - KOPI KILEN (DRINKS)',
-            'Peach Tea (Iced)'                    => '1001838_Peach Tea - KOPI KILEN (DRINKS)',
-            'Cold Brew Sweet'                     => '1001686_Cold Brew Sweet - KOPI KILEN (DRINKS)',
-            'Cold White Coconut'                  => '1001685_Cold White Coconut - KOPI KILEN (DRINKS)',
-            'Add On Milk'                         => '1002720_Add On Milk - KOPI KILEN (DRINKS)',
-            'Add Sambal Setan'                    => '1002332_Add Sambal Setan - KOPI KILEN (MEALS)',
-            'Cold White Caramel'                  => '1001684_Cold White Caramel - KOPI KILEN (DRINKS)',
-            'Cup Ukuran 8 Oz'                     => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
-            'Coca Cola @250Ml'                    => '1001698_Coca Cola @250Ml - KOPI KILEN (DRINKS)',
-            'Roti Bakar Bundling'                 => '1001789_Roti Bakar Bundling - KOPI KILEN (MEALS)',
-            'Red Velvet (Hot)'                    => '1001840_Red Velvet (Hot) - KOPI KILEN (DRINKS)',
-            'Add Ketupat'                         => '1002328_Add Ketupat - KOPI KILEN (MEALS)',
-            'Toraja Sapan Biji @250 Gr'            => '1001520_Toraja Sapan Biji @250 Gr - KOPI KILEN (DRINKS)',
-            'Milk (Iced)'                         => '1002017_Milk (Iced) - KOPI KILEN (DRINKS)',
-            'Add Cucumber / Timun'                => '1002730_Add Cucumber / Timun - KOPI KILEN (MEALS)',
-            'Lemon Tea (Hot)'                     => '1001832_Lemon Tea (Hot) - KOPI KILEN (DRINKS)',
-            'Equil Sparkling Water'             => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
-            'Pineapple Upside Down Cake'        => '1001702_Banana Caramel - KOPI KILEN (MEALS)',
-            'Add Tomat'                         => '1002751_Add on Tomat - KOPI KILEN (MEALS)',
-            'Add on Lemon Juice Syrup 1L'       => '1002336_Add on Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Iced (Mandailin' => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Iced (Trj Sapan)n)' => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
-                'Green Tea (Ice)'                     => '1001826_Green Tea (Ice) - KOPI KILEN (DRINKS)',
-            'Java Tea (Ice)'                      => '1001831_Java Tea (Ice) - KOPI KILEN (DRINKS)',
-            'Aren Latte Ice'                      => '1001805_Aren Latte Ice - KOPI KILEN (DRINKS)',
-            'Cafe Latte (Ice)'                    => '1001807_Cafe Latte (Ice) - KOPI KILEN (DRINKS)',
-            'Aren Latte Hot'                      => '1001804_Aren Latte Hot - KOPI KILEN (DRINKS)',
-            'Creamy Dopio Espresso Ice'           => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Ice (Mandailin'    => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
-            'Chocolate (Ice)'                     => '1001813_Chocolate (Ice) - KOPI KILEN (DRINKS)',
-            'Daily Brew(V-60) Hot (Trj Sapan)'    => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Daily Brew(V-60) Ice (Trj Sapan)'    => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Vanilla Latte (Ice)'                 => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
-            'Lemon Tea (Ice)'                     => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',
-            'Red Velvet (Ice)'                    => '1001841_Red Velvet (Ice) - KOPI KILEN (DRINKS)',
-            'Daily Brew (V-60) Iced (Trj Sapa'    => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Kopi Kilend Blend Biji @250 Gr'      => '1002486_Kopi Kilen Blend 250g - Kopi Kilen',
-            'Gayo Bubuk @250 Gr'                  => '1002485_Aceh Gayo 250 Gr - Kopi Kilen',
-            'Kopi Kilend Blend Bubuk @250 Gr'     => '1002486_Kopi Kilen Blend 250g - Kopi Kilen',
-            'Daily Brew (V-60) Hot (Trj Sapan'    => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
-            'Add on Palm Sugar Syrup'             => '1002728_Add on Palm Sugar Syrup - KOPI KILEN (DRINKS)',
+            'Add On Lemon Juice Syrup 1L'              => '1002336_Add on Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
+            'Milk'                                     => '1002720_Add On Milk - KOPI KILEN (DRINKS)',
+            'Add On Food'                              => '1002482_Add On Food - Kopi Kilen',
+            'Additional Food'                          => '1002482_Add On Food - Kopi Kilen',
+            'Addtional Syrup'                          => '1002483_Add on Syrup - Kopi Kilen',
+            'Sanqua Mineral Water 330 Ml'              => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
+            'Add on Essppresso'                         => '1002337_Add on Essppresso - KOPI KILEN (DRINKS)',
+            'Aren Latte Fresh Milk (Iced)'              => '1001805_Aren Latte Ice - KOPI KILEN (DRINKS)',
+            'Esspreso'                                  => '1001823_Esspreso - KOPI KILEN (DRINKS)',
+            'Aren Latte Fresh Milk (Hot)'               => '1001804_Aren Latte Hot - KOPI KILEN (DRINKS)',
+            'Creamy Dopio Espresso (Iced)'              => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
+            'Add on Caramel Syrup Delifru'              => '1002727_Add on Caramel Syrup - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Iced (Mandailin)'        => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
+            'Cup Ukuran 12 Oz'                          => '1000822_Take Away Iced - KOPI KILEN (DRINKS)',
+            'Add on Peach Syrup Delifru'                => '1002335_Add on Peach Syrup Delifru - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Hot (Trj Sapan)'         => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Iced (Trj Sapan)'        => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Add on Palm Sugar Syrup Delifru'           => '1002728_Add on Palm Sugar Syrup - KOPI KILEN (DRINKS)',
+            'Mie Ayam'                                  => '1001783_Mie Ayam - KOPI KILEN (MEALS)',
+            'Lemon Tea (Iced)'                          => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',
+            'Spunbond'                                  => '1002213_Spunbond - KOPI KILEN PERLENGKAPAN',
+            'Tahu Isi Sayur'                            => '1001793_Tahu Isi Sayur - KOPI KILEN (MEALS)',
+            'Macchiato (Hot)'                           => '1001835_Macchiato (Hot) - KOPI KILEN (DRINKS)',
+            'Add on Lychee Syrup Delifru'               => '1002334_Add on Lychee Syrup Delifru - KOPI KILEN (DRINKS)',
+            'Peach Tea (Iced)'                          => '1001838_Peach Tea - KOPI KILEN (DRINKS)',
+            'Cold Brew Sweet'                           => '1001686_Cold Brew Sweet - KOPI KILEN (DRINKS)',
+            'Cold White Coconut'                        => '1001685_Cold White Coconut - KOPI KILEN (DRINKS)',
+            'Add On Milk'                               => '1002720_Add On Milk - KOPI KILEN (DRINKS)',
+            'Add Sambal Setan'                          => '1002332_Add Sambal Setan - KOPI KILEN (MEALS)',
+            'Cold White Caramel'                        => '1001684_Cold White Caramel - KOPI KILEN (DRINKS)',
+            'Cup Ukuran 8 Oz'                           => '1000821_Take Away Hot - KOPI KILEN (DRINKS)',
+            'Coca Cola @250Ml'                          => '1001698_Coca Cola @250Ml - KOPI KILEN (DRINKS)',
+            'Roti Bakar Bundling'                       => '1001789_Roti Bakar Bundling - KOPI KILEN (MEALS)',
+            'Red Velvet (Hot)'                          => '1001840_Red Velvet (Hot) - KOPI KILEN (DRINKS)',
+            'Add Ketupat'                               => '1002328_Add Ketupat - KOPI KILEN (MEALS)',
+            'Toraja Sapan Biji @250 Gr'                 => '1001520_Toraja Sapan Biji @250 Gr - KOPI KILEN (DRINKS)',
+            'Milk (Iced)'                               => '1002017_Milk (Iced) - KOPI KILEN (DRINKS)',
+            'Add Cucumber / Timun'                      => '1002730_Add Cucumber / Timun - KOPI KILEN (MEALS)',
+            'Lemon Tea (Hot)'                           => '1001832_Lemon Tea (Hot) - KOPI KILEN (DRINKS)',
+            'Equil Sparkling Water'                     => '1001504_Sanqua Mineral Water 330 Ml - KOPI KILEN (DRINKS)',
+            'Pineapple Upside Down Cake'                => '1001702_Banana Caramel - KOPI KILEN (MEALS)',
+            'Add Tomat'                                 => '1002751_Add on Tomat - KOPI KILEN (MEALS)',
+            'Add on Lemon Juice Syrup 1L'               => '1002336_Add on Lemon Juice Syrup 1L - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Iced (Mandailin'         => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Iced (Trj Sapan)n)'      => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Green Tea (Ice)'                           => '1001826_Green Tea (Ice) - KOPI KILEN (DRINKS)',
+            'Java Tea (Ice)'                            => '1001831_Java Tea (Ice) - KOPI KILEN (DRINKS)',
+            'Aren Latte Ice'                            => '1001805_Aren Latte Ice - KOPI KILEN (DRINKS)',
+            'Cafe Latte (Ice)'                          => '1001807_Cafe Latte (Ice) - KOPI KILEN (DRINKS)',
+            'Aren Latte Hot'                            => '1001804_Aren Latte Hot - KOPI KILEN (DRINKS)',
+            'Creamy Dopio Espresso Ice'                 => '1001814_Creamy Dopio Espresso Ice - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Ice (Mandailin'          => '1001817_Daily Brew (V-60) Ice (Mandailing) - KOPI KILEN (DRINKS)',
+            'Chocolate (Ice)'                           => '1001813_Chocolate (Ice) - KOPI KILEN (DRINKS)',
+            'Daily Brew(V-60) Hot (Trj Sapan)'          => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Daily Brew(V-60) Ice (Trj Sapan)'          => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Vanilla Latte (Ice)'                       => '1001843_Vanilla Latte (Ice) - KOPI KILEN (DRINKS)',
+            'Lemon Tea (Ice)'                           => '1001833_Lemon Tea (Ice) - KOPI KILEN (DRINKS)',
+            'Red Velvet (Ice)'                          => '1001841_Red Velvet (Ice) - KOPI KILEN (DRINKS)',
+            'Daily Brew (V-60) Iced (Trj Sapa'          => '1001821_Daily Brew(V-60) Ice (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Kopi Kilend Blend Biji @250 Gr'            => '1002486_Kopi Kilen Blend 250g - Kopi Kilen',
+            'Gayo Bubuk @250 Gr'                        => '1002485_Aceh Gayo 250 Gr - Kopi Kilen',
+            'Kopi Kilend Blend Bubuk @250 Gr'           => '1002486_Kopi Kilen Blend 250g - Kopi Kilen',
+            'Daily Brew (V-60) Hot (Trj Sapan'          => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
+            'Add on Palm Sugar Syrup'                   => '1002728_Add on Palm Sugar Syrup - KOPI KILEN (DRINKS)',
+            'Add Syrup'                                 => '1002483_Add on Syrup - KOPI KILEN (DRINKS)',
         ];
+
+        
+
+        // ===== Special mapping Oat/Soy berdasarkan parent PRODUCT ID (setelah map) =====
+        $milkModifierNames = ['Oat Milk', 'Soy Milk'];
+
+        // Addon ID
+        $OAT_150 = '1002737_Add on Oat Milk 150Ml - KOPI KILEN (DRINKS)';
+        $OAT_60  = '1002738_Add on Oat Milk 60Ml - KOPI KILEN (DRINKS)';
+        $OAT_75  = '1002739_Add on Oat Milk 75Ml - KOPI KILEN (DRINKS)';
+        $OAT_30  = '1002743_Add on Oat Milk 30Ml - KOPI KILEN (DRINKS)';
+
+        $SOY_150 = '1002740_Add on Soy Milk 150Ml - KOPI KILEN (DRINKS)';
+        $SOY_75  = '1002741_Add on Soy Milk 75Ml - KOPI KILEN (DRINKS)';
+        $SOY_60  = '1002742_Add on Soy Milk 60Ml - KOPI KILEN (DRINKS)';
+        $SOY_30  = '1002744_Add on Soy Milk 30Ml - KOPI KILEN (DRINKS)';
+
+        // parent product ids (angka) -> addon
+        $milkAddonByParentProductId = [];
+
+        // group 150ml parents
+        $parents150 = [
+            '1001804','1001805','1001806','1001807','1001808','1001809','1001810','1001811',
+            '1001812','1001813','1001824','1001825','1001826','1001827','1001828','1001836',
+            '1001837','1001840','1001841','1001842','1001843',
+        ];
+        foreach ($parents150 as $pid) {
+            $milkAddonByParentProductId[$pid]['Oat Milk'] = $OAT_150;
+            $milkAddonByParentProductId[$pid]['Soy Milk'] = $SOY_150;
+        }
+
+        // macchiato (Hot)
+        $milkAddonByParentProductId['1001835']['Oat Milk'] = $OAT_60;
+        $milkAddonByParentProductId['1001835']['Soy Milk'] = $SOY_75;
+
+        // piccolo (Hot)
+        $milkAddonByParentProductId['1001839']['Oat Milk'] = $OAT_75;
+        $milkAddonByParentProductId['1001839']['Soy Milk'] = $SOY_60;
+
+        // creamy dopio espresso (iced)
+        $milkAddonByParentProductId['1001814']['Oat Milk'] = $OAT_30;
+        $milkAddonByParentProductId['1001814']['Soy Milk'] = $SOY_30;
+
 
         // === OUTPUT XLSX 3 SHEET ===
         $spreadsheet = new Spreadsheet();
@@ -882,6 +926,8 @@ class QuinosConverterSQController extends Controller
             ];
         }
 
+        $lastParentProductIdByTrx  = []; // parent terakhir per transaksi
+
         foreach ($logicalRows as $row) {
             $trxCode   = $row['trx'];
             $nameRaw   = $row['name'];
@@ -941,8 +987,28 @@ class QuinosConverterSQController extends Controller
             }
 
             $cleanName = $this->normalizeProductName($nameRaw);
+
+            // default mapping normal
             $productId = $productMap[$cleanName] ?? $cleanName;
             $productTrim = explode('_', $productId)[0];
+
+            $categoryUpper = strtoupper(trim($row['category'] ?? ''));
+            $isComboChild  = (bool)($row['is_combo_child'] ?? false);
+
+            // simpan parent product id: item utama (bukan EXTRA, bukan combo child)
+            if (!$isComboChild && $categoryUpper !== 'EXTRA') {
+                $lastParentProductIdByTrx[$trxCode] = $productTrim;
+            }
+
+            // override khusus Oat/Soy: gunakan parentProductTrim
+            if (!$isComboChild && $categoryUpper === 'EXTRA' && in_array($cleanName, $milkModifierNames, true)) {
+                $parentPid = $lastParentProductIdByTrx[$trxCode] ?? null;
+
+                if ($parentPid !== null && isset($milkAddonByParentProductId[$parentPid][$cleanName])) {
+                    $productId = $milkAddonByParentProductId[$parentPid][$cleanName];
+                    $productTrim = explode('_', $productId)[0];
+                }
+            }
 
             // =========================
             // DISCOUNT MAPPING
