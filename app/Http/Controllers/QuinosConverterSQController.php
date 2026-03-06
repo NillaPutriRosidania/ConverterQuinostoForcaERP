@@ -99,15 +99,45 @@ class QuinosConverterSQController extends Controller
         return (float) round($value, 0, PHP_ROUND_HALF_UP);
     }
 
-        private function shouldPb0(array $r): bool
-        {
-            if (!empty($r['is_combo_child'])) return false;
+    private function shouldPb0(array $r): bool
+    {
+        if (!empty($r['is_combo_child'])) return false;
 
-            $category = strtoupper(trim($r['category'] ?? ''));
-            $name     = trim($r['name'] ?? '');
+        $category = strtoupper(trim($r['category'] ?? ''));
+        $nameRaw  = trim($r['name'] ?? '');
+        $cleanName = $this->normalizeProductName($nameRaw);
+        // Khusus Untuk Januari dan Febuari 2026, ada beberapa item EXTRA yang harus dipaksa PB1 10% (berarti PB0 = false)
+        // EXTRA tertentu yang harus PB1 10% (override dari rule PB1 0%)
+        // NOTE: pakai "cleanName" (hasil normalizeProductName) jadi cocok walau ada '#'
+        $extraForcePb10 = [
+            'Add on Lemon Juice Syrup 1L',
+            'Add on Caramel Syrup Delifru',
+            'Cup Ukuran 12 Oz',
+            'Add on Peach Syrup Delifru',
+            'Add on Palm Sugar Syrup Delifru',
+            'Add Sambal Setan',
+            'Cup Ukuran 8 Oz',
+            'Add Ketupat',
+            'Add Tomat',
+            'Add Cucumber / Timun',
+            'Add Sambal Matah',
+            'Add on Palm Sugar Syrup',
+            'Add Emping',
+        ];
 
-            return ($category === 'EXTRA' || $name === 'Paper Bag Kilen');
+        // bikin pembanding case-insensitive
+        $extraForcePb10Upper = array_map('strtoupper', $extraForcePb10);
+        $cleanNameUpper = strtoupper($cleanName);
+
+        // Jika category EXTRA dan masuk daftar override => PB1 10% (berarti PB0 = false)
+        if ($category === 'EXTRA' && in_array($cleanNameUpper, $extraForcePb10Upper, true)) {
+            return false;
         }
+
+        // default rule lama
+        return ($category === 'EXTRA' || $cleanName === 'Paper Bag Kilen' || $cleanName === 'Spunbond');
+    }
+
     public function convert(Request $request)
     {
         $request->validate([
@@ -743,6 +773,7 @@ class QuinosConverterSQController extends Controller
             'Daily Brew (V-60) Hot (Trj Sapan'          => '1001820_Daily Brew(V-60) Hot (Trj Sapan) - KOPI KILEN (DRINKS)',
             'Add on Palm Sugar Syrup'                   => '1002728_Add on Palm Sugar Syrup - KOPI KILEN (DRINKS)',
             'Add Syrup'                                 => '1002483_Add on Syrup - KOPI KILEN (DRINKS)',
+            'Add Emping'                                => '1002846_Add on Emping - KOPI KILEN (MEALS)'
         ];
 
         
