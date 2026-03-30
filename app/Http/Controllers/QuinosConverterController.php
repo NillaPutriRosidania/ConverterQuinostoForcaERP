@@ -220,6 +220,9 @@
                 'Fanta'   => '1001700_Fanta @250Ml - KOPI KILEN (DRINKS)',
                 'Toraja Sapan Bubuk'   => '1001521_Toraja Bubuk @250 Gr - KOPI KILEN (DRINKS)',
                 'Pastry Kilen' => '1002836_Pastry Kilen - KOPI KILEN (MEALS)',
+                'Spunbound' => '1002213_Spunbond - KOPI KILEN PERLENGKAPAN',
+                'Iced Calamnci Black Tea' => '1002825_Iced Calamanci Black Tea - KOPI KILEN (DRINKS)',
+                'Pastry Kilen Plan' => '1002836_Pastry Kilen - KOPI KILEN (MEALS)',
                 
 
                 

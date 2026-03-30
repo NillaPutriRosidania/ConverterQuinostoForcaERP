@@ -11,6 +11,7 @@ use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\ArchiveController;
 // use App\Http\Controllers\EbupotController;
 use App\Http\Controllers\RevenueJournalController;
+use App\Http\Controllers\ProductRecapController;
 
 
 
@@ -87,3 +88,9 @@ Route::get('/posid-material/export', [PosIdMaterialController::class, 'export'])
 Route::get('/revenue-journal', [RevenueJournalController::class, 'upload'])->name('revenue_journal.upload');
 Route::post('/revenue-journal/run', [RevenueJournalController::class, 'run'])->name('revenue_journal.run');
 Route::get('/revenue-journal/download', [RevenueJournalController::class, 'download'])->name('revenue_journal.download');
+
+Route::get('/rekap-products', [ProductRecapController::class, 'index'])
+    ->name('rekap.products.index');
+Route::post('/rekap-products/result', [ProductRecapController::class, 'result'])->name('rekap.products.result');
+Route::post('/rekap-products/download', [ProductRecapController::class, 'download'])
+    ->name('rekap.products.download');
